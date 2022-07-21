@@ -1,6 +1,5 @@
 package com.example.record;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 
 @RestController
@@ -27,7 +25,7 @@ public class FileUploadController {
 
     @RequestMapping(path = "/insertPayload/{times}",
             method = RequestMethod.POST, consumes = {"application/json; charset=UTF-8"})
-    public ResponseEntity<Resource> insertPayload(@RequestBody Object inputPayload, @PathVariable int times) {
+    public ResponseEntity<Resource> insertPayload(@RequestBody String inputPayload, @PathVariable int times) {
 
         fileService.getPopulatedFile(inputPayload, times);
 
@@ -46,7 +44,7 @@ public class FileUploadController {
 
     @RequestMapping(path = "/downloadJson/{times}",
             method = RequestMethod.POST, consumes = {"application/json; charset=UTF-8"})
-    public ResponseEntity<byte[]> downloadPayload(@RequestBody Object inputPayload, @PathVariable int times) {
+    public ResponseEntity<byte[]> downloadPayload(@RequestBody String inputPayload, @PathVariable int times) {
 
         fileService.getPopulatedFile(inputPayload, times);
         byte[] data = null;
@@ -66,12 +64,13 @@ public class FileUploadController {
 
     @RequestMapping(path = "/downloadPayload/{times}",
             method = RequestMethod.POST, consumes = {"application/json; charset=UTF-8"})
-    public RequestFile uploadPayload(@RequestBody Object inputPayload, @PathVariable int times) {
+    public RequestFile uploadPayload(@RequestBody String inputPayload, @PathVariable int times) {
 
 
         fileService.getPopulatedFile(inputPayload, times);
 
         RequestFile requestFile = new RequestFile();
+        requestFile.setFileId("abc123");
         requestFile.setFileName("response.json");
         requestFile.setFileSize(10000);
         requestFile.setContentType(HttpHeaders.CONTENT_DISPOSITION);
