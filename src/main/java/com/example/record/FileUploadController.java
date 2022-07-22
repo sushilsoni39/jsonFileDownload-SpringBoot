@@ -1,13 +1,16 @@
 package com.example.record;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,6 +63,24 @@ public class FileUploadController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=response.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(data);
+    }
+
+
+    @RequestMapping(path = "/downloadFile/{times}",
+            method = RequestMethod.GET, consumes = {"application/json; charset=UTF-8"})
+    public ResponseEntity<FileSystemResource> downloadFile(@RequestBody String inputPayload, @PathVariable int times ) {
+
+        fileService.getPopulatedFile(inputPayload, times);
+
+        File file = new File("object.json");
+        long fileLength = file.length();
+        HttpHeaders respHeaders = new HttpHeaders();
+        respHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        respHeaders.setContentLength(fileLength);
+        respHeaders.setContentDispositionFormData("attachment", "response.json");
+        return new ResponseEntity<FileSystemResource>(
+                new FileSystemResource(file), respHeaders, HttpStatus.OK
+        );
     }
 
     @RequestMapping(path = "/downloadPayload/{times}",
